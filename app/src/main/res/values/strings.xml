@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Repeatitor</string>
+
+    <string name="question">Question</string>
+    <string name="answer">Answer</string>
+
+    <string name="action_settings">Settings</string>
+
+</resources>

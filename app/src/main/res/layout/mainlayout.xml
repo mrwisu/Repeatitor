@@ -1,0 +1,41 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layoutview"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#ffffff"
+    android:animateLayoutChanges="true"
+    android:orientation="vertical" >
+
+    <TextView android:text="@string/question"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/question"
+        android:autoText="false"
+        android:textSize="35sp"
+        android:textStyle="bold"
+        android:typeface="sans"
+        android:layout_margin="15dp" />
+
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/question"
+        android:background="#ff3300"
+        android:textSize="30sp"
+        android:text="@string/answer"
+        android:id="@+id/answer"
+        android:layout_margin="15dp" />
+
+    <SurfaceView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/answer_indicator"
+        android:tag="answer_indicator"
+        android:visibility="invisible" />
+</RelativeLayout>
