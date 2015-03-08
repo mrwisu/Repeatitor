@@ -22,15 +22,12 @@
         android:layout_width="fill_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentRight="true"
         android:layout_below="@+id/question"
         android:background="#ff3300"
         android:textSize="30sp"
         android:text="@string/answer"
         android:id="@+id/answer"
-        android:layout_margin="15dp" />
+        android:layout_margin="10dp" />
 
     <SurfaceView
         android:layout_width="fill_parent"

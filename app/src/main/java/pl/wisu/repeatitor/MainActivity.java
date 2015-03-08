@@ -2,16 +2,18 @@ package pl.wisu.repeatitor;
 
 import android.animation.LayoutTransition;
 import android.annotation.SuppressLint;
-import android.app.ActionBar;
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -28,22 +30,29 @@ public class MainActivity extends Activity {
     int x_cord, y_cord;
     int Likes = 0;
     RelativeLayout parentLayout;
+    LayoutTransition transitioner;
+
+    Map<String, Boolean> answersList;
+
+    OnTouchListener ansTlistener;
 
     public static final int BLINK_TIME_MS = 2000;
 
     TextView question;
     TextView answer;
+    String current_answer;
 
     @SuppressWarnings("deprecation")
     @SuppressLint("NewApi")
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.mainlayout);
 
         parentLayout = (RelativeLayout) findViewById(R.id.layoutview);
 
-        final LayoutTransition transitioner = new LayoutTransition();
+        transitioner = new LayoutTransition();
         parentLayout.setLayoutTransition(transitioner);
 
         Display display = getWindowManager().getDefaultDisplay();
@@ -55,14 +64,9 @@ public class MainActivity extends Activity {
         screenCenterY = windowheight / 2;
 
         question = (TextView)findViewById(R.id.question);
-        answer = (TextView)findViewById(R.id.answer);
 
-        // save default layout
-        final RelativeLayout.LayoutParams def_params = (RelativeLayout.LayoutParams) answer.getLayoutParams();
-        def_params.addRule(RelativeLayout.BELOW, R.id.question);
-
-        final Map<String, Boolean> answersList = new HashMap<>();
-
+        // TODO read from database
+        answersList = new HashMap<>();
         answersList.put("Vancomycin",       false);
         answersList.put("Penicillins",      true);
         answersList.put("Cephalosporins",   true);
@@ -74,9 +78,7 @@ public class MainActivity extends Activity {
 
         question.setText("Lactam?");
 
-        nextAnswer(answer, answersList);
-
-        answer.setOnTouchListener(new OnTouchListener() {
+        ansTlistener = new OnTouchListener() {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -87,11 +89,11 @@ public class MainActivity extends Activity {
                         x_cord = (int) event.getRawX();
                         y_cord = (int) event.getRawY();
 
-                        answer.setX(x_cord - screenCenterX + 40);
-                        answer.setY(y_cord - screenCenterY);
+                        v.setX(x_cord - screenCenterX + 40);
+                        v.setY(y_cord - screenCenterY);
 
                         if (x_cord >= screenCenterX) {
-                            answer
+                            v
                                     .setRotation((float) ((x_cord - screenCenterX) * (Math.PI / 32)));
                             if (x_cord > (screenCenterX + (screenCenterX / 2))) {
                                 if (x_cord > (windowwidth - (screenCenterX / 4))) {
@@ -104,7 +106,7 @@ public class MainActivity extends Activity {
                             }
                         } else {
                             // rotate
-                            answer
+                            v
                                     .setRotation((float) ((x_cord - screenCenterX) * (Math.PI / 32)));
                             if (x_cord < (screenCenterX / 2)) {
                                 if (x_cord < screenCenterX / 4) {
@@ -128,8 +130,7 @@ public class MainActivity extends Activity {
                         if (Likes == 0)
                         {
                             Log.e("Event Status", "Nothing");
-                            parentLayout.removeView(answer);
-                            parentLayout.addView(answer);
+                            newAnswerView(false);
                         }
                         else if (Likes == 1)
                         {
@@ -147,8 +148,7 @@ public class MainActivity extends Activity {
                                 showAnswer(transitioner, true);
                             }
 
-                            parentLayout.removeView(answer);
-                            parentLayout.addView(answer);
+                            newAnswerView(true);
                         }
                         else if (Likes == 2)
                         {
@@ -166,8 +166,7 @@ public class MainActivity extends Activity {
                                 showAnswer(transitioner, false);
                             }
 
-                            parentLayout.removeView(answer);
-                            parentLayout.addView(answer);
+                            newAnswerView(true);
                         }
                         break;
                     default:
@@ -175,7 +174,9 @@ public class MainActivity extends Activity {
                 }
                 return true;
             }
-        });
+        };
+
+        newAnswerView(true);
     }
 
     public void nextAnswer(TextView a, Map<String, Boolean> aList)
@@ -183,7 +184,8 @@ public class MainActivity extends Activity {
         Object[] ansArray = aList.keySet().toArray();
         Random gen = new Random();
         int ansNumber = gen.nextInt(ansArray.length);
-        a.setText(ansArray[ansNumber].toString());
+        current_answer = ansArray[ansNumber].toString();
+        a.setText(current_answer);
     }
 
     public void showAnswer(LayoutTransition trans, boolean correct)
@@ -200,5 +202,30 @@ public class MainActivity extends Activity {
         parentLayout.findViewWithTag("answer_indicator").setVisibility(View.VISIBLE);
         parentLayout.findViewWithTag("answer_indicator").setVisibility(View.INVISIBLE);
         trans.setDuration(0);
+    }
+
+    public void newAnswerView(boolean changeAnswer)
+    {
+        parentLayout.removeView(answer);
+        answer = new TextView(this);
+        RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams((int) ViewGroup.LayoutParams.FILL_PARENT, (int) ViewGroup.LayoutParams.MATCH_PARENT);
+        params.setMargins(10, 10, 10, 10);
+        params.addRule(RelativeLayout.BELOW, R.id.question);
+        answer.setPadding(10, 10, 10, 10);
+        answer.setTextSize((float) 30);
+        answer.setGravity(Gravity.CENTER);
+        answer.setBackgroundColor(Color.parseColor("#ff3300"));
+        answer.setLayoutParams(params);
+        if (changeAnswer)
+        {
+            nextAnswer(answer, answersList);
+        }
+        else
+        {
+            answer.setText(current_answer);
+        }
+        parentLayout.addView(answer);
+        answer.setOnTouchListener(ansTlistener);
+        answer.getMeasuredState();
     }
 }

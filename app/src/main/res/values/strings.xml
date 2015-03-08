@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Repeatitor</string>
+    <string name="app_name">Quickies</string>
 
     <string name="question">Question</string>
     <string name="answer">Answer</string>
